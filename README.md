@@ -4,7 +4,7 @@ Daily "this or that" prompts for your team in Slack — spark casual conversatio
 
 konomi（好み）は、Slackのメンバーに「好きなもの・こと」のお題を配信し、モーダルで回答してもらい、集計結果をWebページで共有するSlackアプリです。各組織が自分のCloudflareとSlack Appでセルフホストします（1つの環境で1つのワークスペース）。
 
-> 開発中です。仕様は [docs/requirements.md](docs/requirements.md) を参照してください。セットアップ手順は実装に合わせて追記していきます。
+> 開発中です。仕様は [docs/requirements.md](docs/requirements.md)、基本設計は [docs/design.md](docs/design.md) を参照してください。セットアップ手順は実装に合わせて追記していきます。
 
 ## 必要なもの
 
