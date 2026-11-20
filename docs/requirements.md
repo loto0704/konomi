@@ -18,9 +18,9 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 
 ### MVPの範囲
 
-選択肢型のお題、2つの配信タイプ、配信スケジュール、手動配信、締切（無期限を含む）、匿名表示の結果ページ、管理画面、セルフホストの手順。
+選択肢型のお題、2つの配信タイプ、配信スケジュール、手動配信、締切（無期限を含む）、匿名／記名をお題ごとに選べる結果ページ、管理画面、セルフホストの手順。
 
-自由記述やリマインドは次の版で扱う。
+自由記述（「その他」の記入を含む）やリマインドは次の版で扱う。
 
 ---
 
@@ -32,7 +32,7 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 | 導入者 | konomiを自分のCloudflareとSlack Appでデプロイする人。多くの場合、管理者を兼ねる |
 | 管理者 | 環境変数 `ADMIN_USER_IDS` で指定した人。管理画面から他の管理者を追加できる |
 | 回答者 | お題に回答する人。チャンネル型では対象チャンネルのメンバー全員、DM型では選ばれた人 |
-| お題 | 質問文と選択肢（2〜4個）。おすすめの配信タイプ（チャンネル向け／DM向け／どちらでも）を持つ |
+| お題 | 質問文と選択肢（2〜4個）。おすすめの配信タイプ（チャンネル向け／DM向け／どちらでも）と、結果の表示方法（匿名／記名）を持つ |
 | 配信スケジュール | 配信タイプ、頻度、時刻、締切、人数などの定期配信の設定。複数作れる |
 | 配信（ラウンド） | 1回分のお題の配信。配信タイプ、対象者、締切、状態（受付中／終了）を持つ |
 | チャンネル型 | 対象チャンネルにお題と「回答する」ボタンを投稿し、誰でも回答できる配信 |
@@ -46,7 +46,8 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 
 ### 3.1 お題管理
 
-- 形式はMVPでは**選択肢型（2〜4択）**のみ
+- 形式はMVPでは**選択肢型（2〜4択）**のみ。次の版で自由記述と「選択肢＋その他の記入」を足せるよう、お題に回答の形式を持たせておく
+- 結果の表示方法（**匿名**／**記名**）をお題ごとに選べる。初期値は匿名。配信時の設定を配信に記録し、あとでお題の設定を変えても過去の配信の表示は変わらない
 - 日本語のお題を数十個、初期データとして同梱する
 - 管理画面で追加・編集・無効化できる
 - おすすめの配信タイプ（チャンネル向け／DM向け／どちらでも）を設定できる
@@ -85,6 +86,7 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 - ボタンを押すとモーダルが開き、選択肢から1つ選んで送信する
 - 1人1回答。締切までは回答を変更できる
 - 送信時にサーバー側で、ワークスペース、締切前か、回答できる人かを確認する。対象外の人には本人だけに見えるメッセージで知らせる
+- 記名のお題では、回答が名前付きで結果ページに表示されることをモーダルで示す
 - 回答後は「回答ありがとうございます」と結果ページへのリンクを表示する
 
 ### 3.6 締切
@@ -97,7 +99,8 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 ### 3.7 結果ページ
 
 - Sign in with Slackでログインし、同じワークスペースのメンバーだけが見られる
-- 票数と割合を**匿名**で表示する（誰がどれを選んだかは出さない）
+- 票数と割合を表示する。匿名の配信では誰がどれを選んだかは出さない
+- 記名の配信では、集計に加えて選択肢ごとに回答者の名前を表示する。名前はDBに保存せず、表示のたびにSlackから取得する
 - 過去の配信の一覧と、それぞれの結果を見られる
 
 ### 3.8 管理画面
@@ -124,7 +127,7 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
                                                                                    │ 締切まで回答を変更できる
                                                                                    ▼
 [結果ページ] ◀── [スレッドに結果を投稿] ◀────────────────────────────── [締切または手動終了]
-ログイン必須・匿名で集計    元の投稿は書き換えない                          無期限は手動で終了
+ログイン必須・匿名か記名で集計   元の投稿は書き換えない                          無期限は手動で終了
 ```
 
 結果ページは、投稿の「結果を見る」リンクからいつでも開ける。
@@ -147,10 +150,10 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 | settings | id（常に1）, channel_id, timezone, exclude_recent_days, include_guests, max_open_unlimited（初期10）, retention_days | PK: id |
 | admins | user_id, added_by, added_at | PK: user_id |
 | user_preferences | user_id, opted_out, excluded_by_admin | PK: user_id |
-| topics | id, question, recommended_type, is_active, last_used_at | IDX: is_active |
+| topics | id, question, recommended_type, answer_format（MVPは選択肢のみ）, result_visibility（匿名／記名）, is_active, last_used_at | IDX: is_active |
 | topic_choices | id, topic_id, label, position | IDX: topic_id |
 | schedules | id, type, days_of_week, time, skip_holidays, deadline_rule, dm_count, is_active, next_run_at | IDX: (is_active, next_run_at) |
-| rounds | id, topic_id, schedule_id, type, channel_id, message_ts, deadline_at（無期限はNULL）, status, created_at | IDX: status, (status, deadline_at) |
+| rounds | id, topic_id, schedule_id, type, result_visibility（配信時のお題の設定を記録）, channel_id, message_ts, deadline_at（無期限はNULL）, status, created_at | IDX: status, (status, deadline_at) |
 | round_targets | round_id, user_id, dm_channel_id, message_ts | PK: (round_id, user_id) |
 | answers | round_id, user_id, choice_id, answered_at, updated_at | UNIQUE: (round_id, user_id) |
 | sessions | id, user_id, expires_at | PK: id, IDX: expires_at |
@@ -254,7 +257,7 @@ Slackの受付、定期配信、Web画面を1つのWorkerで扱い、時間の�
 
 ### データの保存期間
 
-- 回答は記名で記録し、結果ページでは匿名で表示する
+- 回答は記名で記録し、結果ページでは配信ごとの設定（匿名／記名）に従って表示する
 - 回答は1年で自動削除（管理画面から変更可）
 - 期限切れのセッションや `login_states` は定期的に削除する
 - 利用をやめるときに、Worker・D1・Slack Appを削除する手順をREADMEに書く
@@ -326,7 +329,7 @@ konomiはセルフホスト専用のOSSとして公開する。各組織が自�
 | 3 | お題と手動配信（チャンネル型） | 同梱のお題の投入、`/konomi` での手動配信、ボタン → モーダル → 回答の保存と変更 |
 | 4 | 締切と結果の通知 | 時刻指定・無期限の締切、手動終了、スレッドへの結果投稿、無期限配信の上限 |
 | 5 | 配信スケジュールとDM型 | Cron ＋ Queues による定期配信、対象者の選定と除外、DM型の配信、二重実行の防止 |
-| 6 | 結果ページ | Sign in with Slack、セッション、匿名の集計表示、過去の配信の一覧 |
+| 6 | 結果ページ | Sign in with Slack、セッション、集計表示（匿名／記名）、過去の配信の一覧 |
 | 7 | 管理画面 | 各種設定、管理者の追加、記名での回答の確認、オプトアウト |
 | 8 | セルフホストの整備とOSS公開の準備 | セットアップ手順、初期化スクリプト、GitHub Actionsのデプロイ例、保存期間による削除、`SECURITY.md` など |
 
@@ -345,7 +348,7 @@ konomiはセルフホスト専用のOSSとして公開する。各組織が自�
 
 ### 次の版以降で検討する機能
 
-- 自由記述型のお題
+- 自由記述型のお題、「選択肢＋その他の記入」型のお題
 - 未回答者へのリマインド
 - メンバーからのお題の提案
 - 月ごとのまとめ（人気のお題、回答の一覧）
