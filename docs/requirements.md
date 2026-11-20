@@ -150,8 +150,8 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 | settings | id（常に1）, channel_id, timezone, exclude_recent_days, include_guests, max_open_unlimited（初期10）, retention_days | PK: id |
 | admins | user_id, added_by, added_at | PK: user_id |
 | user_preferences | user_id, opted_out, excluded_by_admin | PK: user_id |
-| topics | id, question, recommended_type, answer_format（MVPは選択肢のみ）, result_visibility（匿名／記名）, is_active, last_used_at | IDX: is_active |
-| topic_choices | id, topic_id, label, position | IDX: topic_id |
+| topics | id（UUID）, question, recommended_type, answer_format（MVPは選択肢のみ）, result_visibility（匿名／記名）, is_active, last_used_at | IDX: is_active |
+| topic_choices | id, topic_id（UUID）, label, position | IDX: topic_id |
 | schedules | id, type, days_of_week, time, skip_holidays, deadline_rule, dm_count, is_active, next_run_at | IDX: (is_active, next_run_at) |
 | rounds | id, topic_id, schedule_id, type, result_visibility（配信時のお題の設定を記録）, channel_id, message_ts, deadline_at（無期限はNULL）, status, created_at | IDX: status, (status, deadline_at) |
 | round_targets | round_id, user_id, dm_channel_id, message_ts | PK: (round_id, user_id) |
@@ -165,6 +165,7 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 - **定期配信の二重実行防止**：`schedules.next_run_at` を条件付きで更新できた場合だけ配信する
 - **複数の書き込み**：D1はSQLのトランザクション（`BEGIN`／`COMMIT`）を使えないため、`batch()` でまとめて実行する
 - **管理者**：`ADMIN_USER_IDS` の人は常に管理者として扱い、`admins` には管理画面で追加した人を入れる
+- **ID**：お題はUUIDにする。同梱のお題をあとのバージョンで追加・修正するとき、環境をまたいで同じお題だと分かるようにするため。回答は独自のIDを持たず `(round_id, user_id)` で1件とする。配信など、その他は連番
 
 ---
 
@@ -258,7 +259,7 @@ Slackの受付、定期配信、Web画面を1つのWorkerで扱い、時間の�
 ### データの保存期間
 
 - 回答は記名で記録し、結果ページでは配信ごとの設定（匿名／記名）に従って表示する
-- 回答は1年で自動削除（管理画面から変更可）
+- 保存期間（初期値365日、日単位で管理画面から変更可）を過ぎた配信は、回答とともに配信ごと削除する。結果ページの一覧からも消える
 - 期限切れのセッションや `login_states` は定期的に削除する
 - 利用をやめるときに、Worker・D1・Slack Appを削除する手順をREADMEに書く
 
