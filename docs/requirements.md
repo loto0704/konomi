@@ -49,7 +49,7 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 - 形式はMVPでは**選択肢型（2〜4択）**のみ。次の版で自由記述と「選択肢＋その他の記入」を足せるよう、お題に回答の形式を持たせておく
 - 結果の表示方法（**匿名**／**記名**）をお題ごとに選べる。初期値は匿名。配信時の設定を配信に記録し、あとでお題の設定を変えても過去の配信の表示は変わらない
 - 日本語のお題を数十個、初期データとして同梱する
-- 管理画面で追加・編集・無効化できる
+- 管理画面で追加・編集・無効化できる。配信済みのお題は質問文の修正だけでき、選択肢は変更できない（変えたい場合は無効化して作り直す）
 - おすすめの配信タイプ（チャンネル向け／DM向け／どちらでも）を設定できる
 - 配信済みかどうかを記録し、定期配信では未使用のお題を優先する
 
@@ -149,7 +149,7 @@ konomi（好み）は、Slackのメンバーに「好きなもの・こと」の
 
 | テーブル | 主な項目 | 制約・インデックス |
 | --- | --- | --- |
-| settings | id（常に1）, channel_id, timezone, exclude_recent_days, include_guests, max_open_unlimited（初期10）, retention_days | PK: id |
+| settings | id（常に1）, channel_id, timezone（初期値 Asia/Tokyo）, exclude_recent_days, include_guests, max_open_unlimited（初期10）, retention_days（初期365） | PK: id |
 | admins | user_id, added_by, added_at | PK: user_id |
 | user_preferences | user_id, opted_out, excluded_by_admin | PK: user_id |
 | topics | id（UUID）, question, recommended_type, answer_format（MVPは選択肢のみ）, result_visibility（匿名／記名）, is_active, last_used_at | IDX: is_active |
