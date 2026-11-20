@@ -16,6 +16,8 @@ export default defineConfig(async () => {
             SLACK_CLIENT_ID: "test-client-id",
             SLACK_CLIENT_SECRET: "test-client-secret",
             SESSION_SECRET: "test-session-secret",
+            SLACK_TEAM_ID: "T0TEST",
+            ADMIN_USER_IDS: "U0ADMIN",
           },
         },
       }),

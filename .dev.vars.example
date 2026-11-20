@@ -1,9 +1,17 @@
 # 手元の開発用。`cp .dev.vars.example .dev.vars` でコピーして値を入れる。.dev.vars はコミットしない
+# 値が空や形式違いだと、/slack/* などは 500 を返し、ログに名前だけが出る
+
+# Slack App の「OAuth & Permissions」の Bot User OAuth Token（xoxb- で始まる）
 SLACK_BOT_TOKEN=
+# Slack App の「Basic Information」→ App Credentials
 SLACK_SIGNING_SECRET=
 SLACK_CLIENT_ID=
 SLACK_CLIENT_SECRET=
+# ランダムな長い文字列。例：openssl rand -hex 32
 SESSION_SECRET=
+# ワークスペースの ID（T で始まる）
 SLACK_TEAM_ID=
+# 最初の管理者のメンバー ID（U か W で始まる）。複数はカンマ区切り。1人以上必要
 ADMIN_USER_IDS=
+# オリジンだけ（末尾のパスなし）。https 必須。localhost だけは http でよい
 APP_BASE_URL=http://localhost:8787

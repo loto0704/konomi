@@ -46,13 +46,41 @@ pnpm dev                         # http://localhost:8787
 | `SLACK_SIGNING_SECRET` | Secret | Slack からのリクエストの署名検証 |
 | `SLACK_CLIENT_ID`／`SLACK_CLIENT_SECRET` | Secret | Sign in with Slack |
 | `SESSION_SECRET` | Secret | セッションの署名 |
-| `SLACK_TEAM_ID` | 変数 | 受け付けるワークスペース |
-| `ADMIN_USER_IDS` | 変数 | 最初の管理者（カンマ区切り） |
-| `APP_BASE_URL` | 変数 | 結果ページ・管理画面の URL |
+| `SLACK_TEAM_ID` | 変数 | 受け付けるワークスペースの ID（`T` で始まる） |
+| `ADMIN_USER_IDS` | 変数 | 最初の管理者のメンバー ID（`U` か `W` で始まる）。カンマ区切りで1人以上 |
+| `APP_BASE_URL` | 変数 | 結果ページ・管理画面の URL。オリジンだけ（例：`https://konomi.example.workers.dev`）。`https` 必須で、`localhost` だけは `http` でよい |
 
+- 値が空や形式違いのとき、Slack からのリクエストなどには 500 を返し、Workers のログに `config_invalid` と項目の名前だけを出します（値は出しません）。`/healthz` は設定値に関係なく応答します
 - 変数は `wrangler.jsonc` の各環境の `vars` に書きます
 - Secrets は `pnpm exec wrangler secret put <名前> --env production` で設定します。DB やリポジトリには置きません
 - D1 は名前（`database_name`）だけを書き、`database_id` は書きません。初回のデプロイで同じ名前の D1 が自動で作られます
+
+## Slack App を作る
+
+konomi は配布用の Slack App を持ちません。導入する組織ごとに、リポジトリの `manifest.yml` から自分の Slack App を作ります。
+
+1. `manifest.yml` の `YOUR-WORKER.example.workers.dev`（3か所）を、自分の Worker の URL（`APP_BASE_URL` と同じオリジン）に置き換える
+2. [Slack API の Your Apps](https://api.slack.com/apps) で「Create New App」→「From a manifest」を選び、ワークスペースを選んで中身を貼り付ける
+3. 「Install App」から自分のワークスペースにインストールする
+4. 次の値を Secrets と変数に設定する
+
+| Slack App の画面 | 値 | 設定先 |
+| --- | --- | --- |
+| Basic Information → App Credentials | Client ID／Client Secret／Signing Secret | `SLACK_CLIENT_ID`／`SLACK_CLIENT_SECRET`／`SLACK_SIGNING_SECRET` |
+| OAuth & Permissions | Bot User OAuth Token（`xoxb-`） | `SLACK_BOT_TOKEN` |
+| ブラウザで Slack を開いたときの URL（`https://app.slack.com/client/T…/…`） | `T` で始まる部分 | `SLACK_TEAM_ID` |
+| Slack のプロフィール →「メンバー ID をコピー」 | 管理者のメンバー ID（`U`…） | `ADMIN_USER_IDS` |
+
+Bot のスコープは `chat:write`、`commands`、`channels:read`、`groups:read`、`users:read` の5つです。Sign in with Slack の `openid` と `profile` はログインのときに要求するため、マニフェストには書いていません。
+
+### Slack から届くリクエスト
+
+| パス | 用途 |
+| --- | --- |
+| `POST /slack/commands` | `/konomi` コマンド（コマンド名は仮） |
+| `POST /slack/interactions` | ボタンとモーダルの送信 |
+
+どちらも、Slack の署名とタイムスタンプ（5分以内）を確認し、`team_id` が `SLACK_TEAM_ID` と一致するものだけを受け付けます。ボタンやモーダルは操作した人の所属ワークスペースも確認するため、Slack Connect の外部ユーザーは使えません。拒否したときは 401（署名）／400（本文の形）／403（ワークスペース）を返します。
 
 ## デプロイ
 
