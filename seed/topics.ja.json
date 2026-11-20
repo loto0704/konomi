@@ -1,0 +1,282 @@
+[
+  {
+    "id": "06884dc0-bcdc-42ed-9072-d6a0cbe46b0e",
+    "question": "犬派？猫派？",
+    "choices": ["犬", "猫", "どっちも好き"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "bbc50e66-d403-4a82-9736-f22936f8a1be",
+    "question": "朝ごはんはパン派？ごはん派？",
+    "choices": ["パン", "ごはん", "食べない", "その日による"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "020e32c0-8ced-434f-8397-4ac742c5f6c0",
+    "question": "目玉焼きに何をかける？",
+    "choices": ["しょうゆ", "ソース", "塩こしょう", "ケチャップ"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "24bfee20-d707-4425-b632-e270166ed6c2",
+    "question": "夏と冬、どっちが好き？",
+    "choices": ["夏", "冬"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "62367408-f4b9-4786-9053-0ea535630e5c",
+    "question": "一番好きな季節は？",
+    "choices": ["春", "夏", "秋", "冬"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "6a4407c0-0561-4a33-a8a3-0c8cf55c452b",
+    "question": "休日の過ごし方は？",
+    "choices": ["家でのんびり", "外に出かける", "予定による"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "6923b31d-19c7-4766-b13e-8bb19c2e6d12",
+    "question": "好きなおにぎりの具は？",
+    "choices": ["鮭", "梅", "ツナマヨ", "昆布"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "3122499d-7164-4362-b171-7f875f7ccbe3",
+    "question": "よく飲むのは？",
+    "choices": ["コーヒー", "紅茶", "緑茶", "どれも飲まない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "5dc02af6-1c2e-4d07-8275-500bc9e65e2b",
+    "question": "旅行するなら？",
+    "choices": ["海", "山", "街", "温泉"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "32d3d952-a23a-4b67-b6c8-045810b50b87",
+    "question": "好きな麺類は？",
+    "choices": ["ラーメン", "うどん", "そば", "パスタ"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "e790470c-ce3b-43cf-9daf-970d52d1e13e",
+    "question": "朝型？夜型？",
+    "choices": ["朝型", "夜型", "どちらでもない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "e583d08e-f923-4671-b883-0a715a1c73f8",
+    "question": "映画はどこで観る？",
+    "choices": ["映画館", "配信サービス", "あまり観ない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "c038fb2d-a2ad-4472-8628-62f160a9723d",
+    "question": "好きな寿司ネタは？",
+    "choices": ["マグロ", "サーモン", "エビ", "玉子"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "c957a5ca-0b4e-4370-a1ff-109b3791d886",
+    "question": "カレーの辛さは？",
+    "choices": ["甘口", "中辛", "辛口", "激辛"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "5999dea1-4907-4c18-9759-69d7616d99b9",
+    "question": "本を読むなら？",
+    "choices": ["紙の本", "電子書籍", "オーディオブック", "あまり読まない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "abdecdbf-de2c-425a-813a-89579faf4d60",
+    "question": "好きな中華まんは？",
+    "choices": ["肉まん", "あんまん", "ピザまん", "カレーまん"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "87430c10-1484-46a5-af15-701e2b0ef990",
+    "question": "唐揚げにレモンは？",
+    "choices": ["かける", "かけない", "自分の分だけかける"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "6687344a-dc2d-47ec-8ffe-d01a6ae706f2",
+    "question": "好きなおやつは？",
+    "choices": ["チョコ", "ポテトチップス", "和菓子", "フルーツ"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "649fc2db-d84f-43df-ac1b-51fecd540eba",
+    "question": "雨の日の過ごし方は？",
+    "choices": ["家にこもる", "気にせず出かける", "カフェで過ごす"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "ee8d1319-3a72-43ec-9e0e-9dcf18cdb9f7",
+    "question": "行ってみたい地域は？",
+    "choices": ["アジア", "ヨーロッパ", "南北アメリカ", "それ以外"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "fdc830dc-6ad7-4a62-b246-6445ac9d3f02",
+    "question": "音楽をよく聴くのはどんなとき？",
+    "choices": ["仕事中", "移動中", "家でくつろぐとき", "あまり聴かない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "6c007fff-3401-4d50-857e-b8e4b32be5e1",
+    "question": "好きな鍋は？",
+    "choices": ["寄せ鍋", "キムチ鍋", "すき焼き", "しゃぶしゃぶ"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "6c9fcec9-51ab-4b67-8a7b-d0614ee33b54",
+    "question": "卵焼きの味つけは？",
+    "choices": ["甘い", "しょっぱい", "だし巻き"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "e4fddbfd-9861-4cca-9a5d-8e5fb21815fd",
+    "question": "お風呂はシャワー派？湯船派？",
+    "choices": ["シャワー", "湯船", "季節による"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "599efbd4-5982-4ec0-9c78-3c46389d9130",
+    "question": "好きなパンは？",
+    "choices": ["食パン", "クロワッサン", "メロンパン", "カレーパン"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "d492bf6c-fcf3-48d3-bf92-fa56a7360222",
+    "question": "スポーツは観る派？やる派？",
+    "choices": ["観る", "やる", "両方", "どちらもしない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "ceb2fed7-571b-40de-b713-d45016196c46",
+    "question": "好きなアイスの形は？",
+    "choices": ["カップ", "コーン", "バー", "もなか"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "e72df3fa-08c2-4dd0-9312-ddf1a5a31e06",
+    "question": "子どものころ好きだった遊びは？",
+    "choices": ["鬼ごっこ", "かくれんぼ", "ゲーム", "ブロック・工作"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "06a6f0ba-aa64-448d-88f8-705af46a358e",
+    "question": "目覚ましは何回かける？",
+    "choices": ["1回", "2〜3回", "4回以上", "かけない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "4fbc0ee3-fb32-4b7b-a616-e7f1a70ffbf1",
+    "question": "好きなお祭りの屋台は？",
+    "choices": ["たこ焼き", "焼きそば", "りんご飴", "かき氷"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "3ccf297b-4719-4688-aa9e-38e32ad5e1fe",
+    "question": "休憩中についやってしまうのは？",
+    "choices": ["スマホを見る", "散歩する", "おやつを食べる", "誰かと話す"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "96baa834-be1c-423e-b51b-ca41b4a7917b",
+    "question": "旅行の計画は？",
+    "choices": ["きっちり立てる", "ざっくり決める", "ほぼ決めない"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "cfa2b24f-801e-403a-8618-5824bef202af",
+    "question": "好きな天気は？",
+    "choices": ["晴れ", "くもり", "雨", "雪"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "fe2bc806-97c9-4b17-a14f-b37f81c1df28",
+    "question": "好きなピザは？",
+    "choices": ["マルゲリータ", "シーフード", "照り焼き", "チーズたっぷり"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "6068e987-c7de-4e39-a34f-94b96993189c",
+    "question": "動物園で一番見たい動物は？",
+    "choices": ["パンダ", "ゾウ", "キリン", "ペンギン"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "4e7a7798-40e9-4893-9f5a-e7e6469c3b13",
+    "question": "好きな丼は？",
+    "choices": ["牛丼", "親子丼", "カツ丼", "海鮮丼"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "367e3898-004a-4cf0-a721-a5877b1e9311",
+    "question": "宝くじが当たったら？",
+    "choices": ["貯金する", "旅行に行く", "欲しかった物を買う", "誰かにごちそうする"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "00669acf-d69f-4af2-b49e-beb1bf1b4b78",
+    "question": "作業中のBGMは？",
+    "choices": ["歌あり", "歌なし", "自然の音", "無音"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "4b22801e-932a-4677-97ba-adb3b90b1091",
+    "question": "好きなデザートは？",
+    "choices": ["プリン", "ケーキ", "パフェ", "あんみつ"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  },
+  {
+    "id": "ae7923d4-3040-4fa3-9132-7c5cd874cc92",
+    "question": "1日だけ超能力が使えるなら？",
+    "choices": ["瞬間移動", "時間を止める", "空を飛ぶ", "心を読む"],
+    "recommendedType": "any",
+    "resultVisibility": "anonymous"
+  }
+]
