@@ -1,0 +1,58 @@
+# konomi の Slack App マニフェスト
+#
+# 使い方：https://api.slack.com/apps →「Create New App」→「From a manifest」で、
+# 自分のワークスペースを選んでこのファイルの中身を貼り付ける。
+# 貼り付ける前に、下の YOUR-WORKER.example.workers.dev（3か所）を自分の Worker の URL
+# （APP_BASE_URL と同じオリジン）に置き換える。
+#
+# スコープは docs/requirements.md「Slack Appの設定」の案のとおり。増やす場合は要件定義書と合わせて見直す。
+# ログイン用の openid と profile は、Sign in with Slack のときに認可画面で要求する（ここには書かない。
+# ここに書くとインストールした人のユーザートークンが発行されてしまうため）。
+
+_metadata:
+  major_version: 1
+  minor_version: 1
+
+display_information:
+  name: konomi
+  description: 好きなもの・ことのお題を配信して、みんなの好みを知るアプリ
+  long_description: konomi（好み）は、メンバーに「好きなもの・こと」のお題を配信し、モーダルで回答してもらい、集計結果をWebページで共有するアプリです。各組織が自分の Cloudflare と Slack App でセルフホストします。回答は記名で記録され、管理者は誰がどれを選んだかを確認できます。結果ページでの表示（匿名／記名）はお題ごとに決まります。
+  background_color: "#3f4a5a"
+
+features:
+  app_home:
+    home_tab_enabled: false
+    # DM型の依頼は App Home のメッセージタブに届く
+    messages_tab_enabled: true
+    # konomi は DM への返信を読まないため、メンバーからは送れないようにする
+    messages_tab_read_only_enabled: true
+  bot_user:
+    display_name: konomi
+    always_online: true
+  slash_commands:
+    # コマンド名は仮（docs/requirements.md「11. 未決事項」）
+    - command: /konomi
+      url: https://YOUR-WORKER.example.workers.dev/slack/commands
+      description: お題をすぐに配信する（管理者）。optout／optin で参加を切り替える
+      usage_hint: "[optout | optin]"
+      should_escape: false
+
+oauth_config:
+  # Sign in with Slack（結果ページ・管理画面のログイン）の戻り先
+  redirect_urls:
+    - https://YOUR-WORKER.example.workers.dev/auth/slack/callback
+  scopes:
+    bot:
+      - chat:write # チャンネル投稿、DM、スレッドへの結果投稿
+      - commands # /konomi
+      - channels:read # 対象チャンネル（公開）のメンバー取得
+      - groups:read # 対象チャンネル（非公開）のメンバー取得
+      - users:read # Bot・削除済み・ゲスト・外部ユーザーの判定、記名表示の名前
+
+settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://YOUR-WORKER.example.workers.dev/slack/interactions
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
