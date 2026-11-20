@@ -1,0 +1,90 @@
+// konomi の Wrangler 設定
+//
+// - 最上位：手元の開発（wrangler dev）とテスト用。Worker 名は本番と被らない konomi-local
+// - env.dev：開発用の環境（Worker konomi-dev、D1 konomi-dev-db）
+// - env.production：本番用の環境（Worker konomi、D1 konomi-db）
+//
+// D1 は database_name だけを書き、database_id は書かない。
+// 初回の `wrangler deploy` で同じ名前の D1 が自動で作られ、以降は名前で結び付く（Wrangler の自動プロビジョニング）。
+// 各組織の値（SLACK_TEAM_ID など）は vars に書く。Secrets は `wrangler secret put` で設定し、このファイルには書かない。
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "konomi-local",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "konomi-local-db",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "secrets": {
+    "required": [
+      "SLACK_BOT_TOKEN",
+      "SLACK_SIGNING_SECRET",
+      "SLACK_CLIENT_ID",
+      "SLACK_CLIENT_SECRET",
+      "SESSION_SECRET"
+    ]
+  },
+  // 手元では .dev.vars の値が優先される
+  "vars": {
+    "SLACK_TEAM_ID": "",
+    "ADMIN_USER_IDS": "",
+    "APP_BASE_URL": "http://localhost:8787"
+  },
+  "env": {
+    "dev": {
+      "secrets": {
+        "required": [
+          "SLACK_BOT_TOKEN",
+          "SLACK_SIGNING_SECRET",
+          "SLACK_CLIENT_ID",
+          "SLACK_CLIENT_SECRET",
+          "SESSION_SECRET"
+        ]
+      },
+      "name": "konomi-dev",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "konomi-dev-db",
+          "migrations_dir": "migrations"
+        }
+      ],
+      // 導入時に自分の値に書き換える
+      "vars": {
+        "SLACK_TEAM_ID": "",
+        "ADMIN_USER_IDS": "",
+        "APP_BASE_URL": ""
+      }
+    },
+    "production": {
+      "secrets": {
+        "required": [
+          "SLACK_BOT_TOKEN",
+          "SLACK_SIGNING_SECRET",
+          "SLACK_CLIENT_ID",
+          "SLACK_CLIENT_SECRET",
+          "SESSION_SECRET"
+        ]
+      },
+      "name": "konomi",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "konomi-db",
+          "migrations_dir": "migrations"
+        }
+      ],
+      // 導入時に自分の値に書き換える
+      "vars": {
+        "SLACK_TEAM_ID": "",
+        "ADMIN_USER_IDS": "",
+        "APP_BASE_URL": ""
+      }
+    }
+  }
+}

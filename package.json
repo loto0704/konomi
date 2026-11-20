@@ -1,0 +1,41 @@
+{
+  "name": "konomi",
+  "version": "0.0.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "typecheck": "wrangler types --env-interface Env --strict-vars=false --check && tsc --noEmit",
+    "cf-typegen": "wrangler types --env-interface Env --strict-vars=false",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "deploy:dev": "wrangler d1 migrations apply DB --remote --env dev && wrangler deploy --env dev",
+    "deploy:production": "wrangler d1 migrations apply DB --remote --env production && wrangler deploy --env production"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.19"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.8",
+    "@cloudflare/vitest-plugin": "^1.8.5",
+    "drizzle-kit": "^0.31.11",
+    "typescript": "~5.9.3",
+    "vitest": "~4.1.12",
+    "wrangler": "^4.165.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
+  }
+}
