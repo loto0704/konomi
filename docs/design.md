@@ -15,14 +15,29 @@ konomi MVP を実装するための基本設計。仕様の正は `docs/requirem
 
 1つの Worker が `fetch`（Slack と Web）、`scheduled`（Cron）、`queue`（Queue 受信）の3つの入口を持ち、Slack への送信は原則 `queue` から行う。
 
-```text
-Slack    ──▶ fetch      /slack/commands, /slack/interactions（3秒以内に応答）
-ブラウザ ──▶ fetch      /login, /rounds, /admin（Hono JSX）
-Cron     ──▶ scheduled  定期配信の抽出、締切、削除 ──┐
-                                                     ▼ 送信はメッセージにして投入
-Queue    ──▶ queue      post_round, select_targets, send_dm, post_result ──▶ Slack Web API
-
-どの入口も D1 を読み書きする（1つの Worker の中）
+```mermaid
+flowchart LR
+  slack["Slack"]
+  browser["ブラウザ"]
+  cronT["Cron Triggers<br>5分おき"]
+  subgraph worker["Worker（konomi）"]
+    direction TB
+    fetch["fetch<br>/slack/commands, /slack/interactions（3秒以内に応答）<br>/login, /rounds, /admin（Hono JSX）"]
+    scheduled["scheduled<br>定期配信の抽出、締切、削除"]
+    queue["queue<br>post_round, select_targets, send_dm, post_result"]
+  end
+  q[["Queue（JOBS）"]]
+  d1[("D1")]
+  api["Slack Web API"]
+  slack --> fetch
+  browser --> fetch
+  cronT --> scheduled
+  fetch -- "送信はメッセージにして投入" --> q
+  scheduled -- "送信はメッセージにして投入" --> q
+  q --> queue
+  queue --> api
+  fetch -- "views.open（3秒以内）" --> api
+  worker <--> d1
 ```
 
 例外は `views.open` と、モーダルの応答本文だけ。これらは 3 秒以内に必要なため `fetch` の中で直接行う。
