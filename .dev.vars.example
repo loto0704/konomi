@@ -1,0 +1,9 @@
+# 手元の開発用。`cp .dev.vars.example .dev.vars` でコピーして値を入れる。.dev.vars はコミットしない
+SLACK_BOT_TOKEN=
+SLACK_SIGNING_SECRET=
+SLACK_CLIENT_ID=
+SLACK_CLIENT_SECRET=
+SESSION_SECRET=
+SLACK_TEAM_ID=
+ADMIN_USER_IDS=
+APP_BASE_URL=http://localhost:8787
