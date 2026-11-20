@@ -18,7 +18,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "deploy:dev": "wrangler d1 migrations apply DB --remote --env dev && wrangler deploy --env dev",
-    "deploy:production": "wrangler d1 migrations apply DB --remote --env production && wrangler deploy --env production"
+    "deploy:production": "wrangler d1 migrations apply DB --remote --env production && wrangler deploy --env production",
+    "db:seed-sql": "node scripts/seed-topics-sql.mjs"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
