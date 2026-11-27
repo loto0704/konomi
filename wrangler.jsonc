@@ -13,6 +13,8 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-11-01",
   "observability": { "enabled": true },
+  // 5分おき（UTC）。締切を過ぎた配信の終了と結果の投稿を行う（定期配信もここに足す）
+  "triggers": { "crons": ["*/5 * * * *"] },
   "d1_databases": [
     {
       "binding": "DB",
@@ -47,6 +49,7 @@
         ]
       },
       "name": "konomi-dev",
+      "triggers": { "crons": ["*/5 * * * *"] },
       "d1_databases": [
         {
           "binding": "DB",
@@ -72,6 +75,7 @@
         ]
       },
       "name": "konomi",
+      "triggers": { "crons": ["*/5 * * * *"] },
       "d1_databases": [
         {
           "binding": "DB",

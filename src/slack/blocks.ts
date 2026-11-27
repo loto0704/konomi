@@ -4,8 +4,9 @@
  */
 import type { AnswerContext } from "../core/answering";
 import type { ManualDeliveryForm } from "../core/delivery";
-import type { RoundPost } from "../core/ports";
+import type { RoundPost, RoundResultPost } from "../core/ports";
 import { formatShort } from "../core/time";
+import type { OpenRoundSummary } from "../db/repo";
 import type { MessageKey } from "../i18n";
 import { t } from "../i18n";
 
@@ -23,6 +24,9 @@ export const IDS = {
   deadlineAtInput: "deadline_at_picker",
   choiceBlock: "choice",
   choiceInput: "choice_radio",
+  closeView: "konomi_close",
+  closeRoundBlock: "close_round",
+  closeRoundInput: "close_round_select",
 } as const;
 
 type Block = Record<string, unknown>;
@@ -88,6 +92,94 @@ export function roundMessage(
           },
         ],
       },
+    ],
+  };
+}
+
+/** 終了した配信の結果の概要（元の投稿のスレッドに投稿する） */
+export function roundResultMessage(
+  post: RoundResultPost,
+  appBaseUrl: string,
+): { text: string; blocks: Block[] } {
+  const heading = t(post.reason === "manual" ? "result.closedManually" : "result.closedByDeadline");
+  const summary =
+    post.total === 0
+      ? t("result.noAnswers")
+      : post.items
+          .map((item) =>
+            t("result.item", {
+              label: escapeMrkdwn(item.label),
+              count: item.count,
+              percent: item.percent,
+            }),
+          )
+          .join("\n");
+  const plainSummary =
+    post.total === 0
+      ? t("result.noAnswers")
+      : post.items.map((item) => `${item.label} ${item.percent}%`).join(" / ");
+  return {
+    text: `${heading} ${plainSummary}`,
+    blocks: [
+      { type: "section", text: mrkdwn(`*${heading}*\n${summary}`) },
+      { type: "context", elements: [mrkdwn(t("result.total", { total: post.total }))] },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            action_id: IDS.resultButton,
+            text: plain(t("round.resultButton")),
+            url: resultUrl(appBaseUrl, post.roundId),
+          },
+        ],
+      },
+    ],
+  };
+}
+
+/** 手動終了のモーダルの private_metadata */
+export type CloseMetadata = { responseUrl: string };
+
+/** 受付中の配信を選んで終了するモーダル */
+export function closeModal(
+  rounds: readonly OpenRoundSummary[],
+  timezone: string,
+  metadata: CloseMetadata,
+): View {
+  return {
+    type: "modal",
+    callback_id: IDS.closeView,
+    private_metadata: JSON.stringify(metadata),
+    title: plain(t("close.modalTitle")),
+    submit: plain(t("close.submit")),
+    close: plain(t("delivery.cancel")),
+    blocks: [
+      {
+        type: "input",
+        block_id: IDS.closeRoundBlock,
+        label: plain(t("close.roundLabel")),
+        element: {
+          type: "static_select",
+          action_id: IDS.closeRoundInput,
+          placeholder: plain(t("close.roundPlaceholder")),
+          options: rounds.map(({ round, question }) => ({
+            text: plain(truncate(question, 75)),
+            description: plain(
+              truncate(
+                round.deadlineAt === null
+                  ? t("close.optionNoDeadline")
+                  : t("close.optionDeadline", {
+                      deadline: formatShort(round.deadlineAt, timezone),
+                    }),
+                75,
+              ),
+            ),
+            value: String(round.id),
+          })),
+        },
+      },
+      { type: "context", elements: [mrkdwn(t("close.note"))] },
     ],
   };
 }
@@ -204,10 +296,10 @@ export function answerModal(ctx: AnswerContext): View {
 }
 
 /** 回答後や、回答できないときに差し替える、送信ボタンのないモーダル */
-export function messageModal(lines: string[]): View {
+export function messageModal(lines: string[], title: MessageKey = "answer.modalTitle"): View {
   return {
     type: "modal",
-    title: plain(t("answer.modalTitle")),
+    title: plain(t(title)),
     close: plain(t("answer.close")),
     blocks: lines.map((line) => ({ type: "section", text: mrkdwn(line) })),
   };

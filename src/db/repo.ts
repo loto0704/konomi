@@ -2,7 +2,7 @@
  * テーブルの読み書き。src/core からはここの関数だけを使い、SQL や Drizzle を直接書かない。
  * 複数の書き込みは D1 のトランザクションではなく batch() でまとめる。
  */
-import { and, asc, count, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import type { Db } from "./client";
 import {
   admins,
@@ -198,4 +198,74 @@ export async function upsertAnswer(
       target: [answers.roundId, answers.userId],
       set: { choiceId: input.choiceId, updatedAt: input.now },
     });
+}
+
+/* ---------- 締切と終了 ---------- */
+
+/**
+ * 受付中の配信を終了にする。まだ受付中だったときだけ更新し、更新した配信を返す。
+ * 締切の Cron と手動終了が同時に走っても、結果の投稿は1回だけになる
+ */
+export async function closeOpenRound(db: Db, roundId: number): Promise<Round | null> {
+  const [row] = await db
+    .update(rounds)
+    .set({ status: "closed" })
+    .where(and(eq(rounds.id, roundId), eq(rounds.status, "open")))
+    .returning();
+  return row ?? null;
+}
+
+/** 締切を過ぎたのに受付中の配信の ID。締切の早い順に limit 件 */
+export async function listDueRoundIds(db: Db, now: number, limit: number): Promise<number[]> {
+  const rows = await db
+    .select({ id: rounds.id })
+    .from(rounds)
+    .where(
+      and(eq(rounds.status, "open"), isNotNull(rounds.deadlineAt), lte(rounds.deadlineAt, now)),
+    )
+    .orderBy(asc(rounds.deadlineAt))
+    .limit(limit);
+  return rows.map((r) => r.id);
+}
+
+export type OpenRoundSummary = { round: Round; question: string };
+
+/** 投稿済みで受付中の配信と、そのお題の質問文。新しい順に limit 件 */
+export async function listOpenRounds(db: Db, limit: number): Promise<OpenRoundSummary[]> {
+  const rows = await db
+    .select({ round: rounds, question: topics.question })
+    .from(rounds)
+    .innerJoin(topics, eq(topics.id, rounds.topicId))
+    .where(and(eq(rounds.status, "open"), isNotNull(rounds.messageTs)))
+    .orderBy(desc(rounds.createdAt), desc(rounds.id))
+    .limit(limit);
+  return rows;
+}
+
+/** 集計に必要なもの（配信、選択肢、選択肢ごとの回答数）を batch で1回で読む */
+export async function loadRoundTally(
+  db: Db,
+  roundId: number,
+): Promise<{
+  round: Round;
+  choices: TopicChoice[];
+  counts: { choiceId: number; n: number }[];
+} | null> {
+  const [roundRows, choiceRows, counts] = await db.batch([
+    db.select().from(rounds).where(eq(rounds.id, roundId)),
+    db
+      .select({ choice: topicChoices })
+      .from(rounds)
+      .innerJoin(topicChoices, eq(topicChoices.topicId, rounds.topicId))
+      .where(eq(rounds.id, roundId))
+      .orderBy(asc(topicChoices.position)),
+    db
+      .select({ choiceId: answers.choiceId, n: count() })
+      .from(answers)
+      .where(eq(answers.roundId, roundId))
+      .groupBy(answers.choiceId),
+  ]);
+  const round = roundRows[0];
+  if (!round) return null;
+  return { round, choices: choiceRows.map((r) => r.choice), counts };
 }

@@ -1,8 +1,11 @@
 /** 日本語の文言。キーは「場所.内容」。{name} は t() の vars で置き換える */
 export const ja = {
   "command.notReady": "この操作はまだ使えません。もうしばらくお待ちください。",
-  "command.usage": "使い方：`{command}` でお題をすぐに配信します（管理者のみ）。",
+  "command.usage":
+    "使い方：`{command}` でお題をすぐに配信します。`{command} close` で受付中の配信を終了します（どちらも管理者のみ）。",
   "command.adminOnly": "お題の配信は管理者だけができます。",
+  "command.closeAdminOnly": "配信の終了は管理者だけができます。",
+  "command.noOpenRounds": "受付中の配信はありません。",
   "command.noTopics":
     "配信できるお題がありません。管理画面でお題を追加するか、有効にしてください。",
   "command.botNotInChannel":
@@ -28,7 +31,7 @@ export const ja = {
   "delivery.error.deadlineMissing": "締切の日時を入れてください。",
   "delivery.error.deadlinePast": "締切は今から5分以上あとの日時にしてください。",
   "delivery.error.unlimitedLimit":
-    "受付中の無期限の配信が上限（{max}件）に達しています。どれかを終了するか、締切を指定してください。",
+    "受付中の無期限の配信が上限（{max}件）に達しています。`/konomi close` でどれかを終了するか、締切を指定してください。",
   "delivery.error.postFailed":
     "お題を投稿できませんでした。konomi がチャンネルに参加しているか確かめて、もう一度お試しください。",
 
@@ -37,6 +40,25 @@ export const ja = {
   "round.noDeadline": "締切なし",
   "round.answerButton": "回答する",
   "round.resultButton": "結果を見る",
+
+  "close.modalTitle": "配信を終了する",
+  "close.submit": "終了する",
+  "close.roundLabel": "終了する配信",
+  "close.roundPlaceholder": "受付中の配信を選ぶ",
+  "close.optionDeadline": "締切 {deadline}",
+  "close.optionNoDeadline": "無期限",
+  "close.note":
+    "終了すると回答の受付を止め、元の投稿のスレッドに結果を投稿します。終了した配信は元に戻せません。",
+  "close.error.unavailable": "この配信はもう終了しているか、見つかりません。",
+  "close.done": "配信を終了しました。スレッドに結果を投稿します。",
+  "close.error.postFailed":
+    "配信は終了しましたが、スレッドに結果を投稿できませんでした。konomi がチャンネルに参加しているか確かめてください。",
+
+  "result.closedByDeadline": "締切です。",
+  "result.closedManually": "受付を終了しました。",
+  "result.item": "{label}　{percent}%（{count}票）",
+  "result.noAnswers": "回答はありませんでした。",
+  "result.total": "回答 {total}人",
 
   "answer.modalTitle": "お題に回答する",
   "answer.submit": "送信",

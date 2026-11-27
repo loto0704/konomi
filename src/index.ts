@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { AppEnv } from "./app-env";
+import { runScheduled } from "./scheduled";
 import { slackRoutes } from "./slack/routes";
 
 export const app = new Hono<AppEnv>();
@@ -11,4 +12,7 @@ app.route("/slack", slackRoutes);
 
 export default {
   fetch: app.fetch,
+  scheduled(controller, env, ctx) {
+    ctx.waitUntil(runScheduled(env, Math.floor(controller.scheduledTime / 1000)));
+  },
 } satisfies ExportedHandler<Env>;
