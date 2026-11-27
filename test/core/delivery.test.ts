@@ -7,21 +7,11 @@ import {
   resolveTargetChannel,
   startManualChannelRound,
 } from "../../src/core/delivery";
-import type { Messenger, RoundPost } from "../../src/core/ports";
 import { rounds, settings, topics } from "../../src/db/schema";
 import { db, makeRound, makeTopic } from "../helpers/db";
+import { FakeMessenger } from "../helpers/messenger";
 
 const NOW = 1_800_000_000;
-
-class FakeMessenger implements Messenger {
-  posts: RoundPost[] = [];
-  fail = false;
-  async postRound(post: RoundPost) {
-    if (this.fail) throw new Error("boom");
-    this.posts.push(post);
-    return { messageTs: `ts-${post.roundId}` };
-  }
-}
 
 describe("投稿先のチャンネル", () => {
   it("設定があればそちら、なければ実行したチャンネル", () => {

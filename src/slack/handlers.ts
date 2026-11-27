@@ -5,6 +5,7 @@
 import type { Context } from "hono";
 import { isAdmin } from "../core/admin";
 import { checkCanOpenAnswer, submitAnswer } from "../core/answering";
+import { announceResult, closeRound, listClosableRounds } from "../core/closing";
 import {
   type ManualDeliveryError,
   prepareManualDelivery,
@@ -21,6 +22,8 @@ import { respondEphemeral, SlackApiError, SlackClient } from "./api";
 import {
   type AnswerMetadata,
   answerModal,
+  type CloseMetadata,
+  closeModal,
   type DeliveryMetadata,
   deliveryModal,
   IDS,
@@ -53,6 +56,7 @@ function errorCode(err: unknown): string {
 export async function handleCommand(c: Ctx, cmd: SlashCommand): Promise<Response> {
   const sub = cmd.text.trim().toLowerCase();
   if (sub === "optout" || sub === "optin") return ephemeral(c, t("command.notReady"));
+  if (sub === "close") return handleCloseCommand(c, cmd);
   if (sub !== "") return ephemeral(c, t("command.usage", { command: cmd.command }));
 
   const { db, slack } = deps(c);
@@ -83,6 +87,24 @@ export async function handleCommand(c: Ctx, cmd: SlashCommand): Promise<Response
   return c.body(null, 200);
 }
 
+/** `/konomi close`：受付中の配信を選んで終了するモーダルを開く（管理者のみ） */
+async function handleCloseCommand(c: Ctx, cmd: SlashCommand): Promise<Response> {
+  const { db, slack } = deps(c);
+  if (!(await isAdmin(db, c.var.config.adminUserIds, cmd.userId))) {
+    return ephemeral(c, t("command.closeAdminOnly"));
+  }
+  try {
+    const [rounds, settings] = await Promise.all([listClosableRounds(db), getSettings(db)]);
+    if (rounds.length === 0) return ephemeral(c, t("command.noOpenRounds"));
+    const metadata: CloseMetadata = { responseUrl: cmd.responseUrl };
+    await slack.openView(cmd.triggerId, closeModal(rounds, settings.timezone, metadata));
+  } catch (err) {
+    log.error("close_modal_failed", { code: errorCode(err) });
+    return ephemeral(c, t("command.failed"));
+  }
+  return c.body(null, 200);
+}
+
 /* ---------- ボタン・モーダル送信 ---------- */
 
 export async function handleInteraction(c: Ctx, payload: InteractionPayload): Promise<Response> {
@@ -91,6 +113,7 @@ export async function handleInteraction(c: Ctx, payload: InteractionPayload): Pr
     const view = asRecord(payload.view);
     if (view?.callback_id === IDS.deliveryView) return handleDeliverySubmit(c, payload, view);
     if (view?.callback_id === IDS.answerView) return handleAnswerSubmit(c, payload, view);
+    if (view?.callback_id === IDS.closeView) return handleCloseSubmit(c, payload, view);
   }
   // 結果ページへのリンクボタンなど、何もしない操作も 200 で受け取る
   return c.body(null, 200);
@@ -238,6 +261,50 @@ async function handleAnswerSubmit(
   return c.json({
     response_action: "update",
     view: messageModal([t(REJECTION_KEYS[result.reason])]),
+  });
+}
+
+/**
+ * 手動終了のモーダルの送信。終了（D1 の更新1回）までをその場で行い、
+ * スレッドへの結果の投稿は waitUntil に回す
+ */
+async function handleCloseSubmit(
+  c: Ctx,
+  payload: InteractionPayload,
+  view: Record<string, unknown>,
+): Promise<Response> {
+  const { db, slack } = deps(c);
+  if (!(await isAdmin(db, c.var.config.adminUserIds, payload.user.id))) {
+    return c.json({
+      response_action: "update",
+      view: messageModal([t("command.closeAdminOnly")], "close.modalTitle"),
+    });
+  }
+
+  const metadata = parseMetadata<CloseMetadata>(view.private_metadata);
+  const roundId = parseId(
+    selectedValue(stateValues(view), IDS.closeRoundBlock, IDS.closeRoundInput),
+  );
+  if (roundId === null) return errors(c, IDS.closeRoundBlock, "close.error.unavailable");
+
+  const closed = await closeRound(db, roundId);
+  if (closed.result !== "closed") return errors(c, IDS.closeRoundBlock, "close.error.unavailable");
+  log.info("round_closed", { round: roundId, reason: "manual" });
+
+  c.executionCtx.waitUntil(
+    (async () => {
+      const { result, error } = await announceResult(db, slack, roundId, "manual");
+      if (result === "failed") {
+        log.error("result_post_failed", { round: roundId, code: errorCode(error) });
+        await respondEphemeral(metadata?.responseUrl ?? "", t("close.error.postFailed"));
+      } else {
+        log.info("result_posted", { round: roundId, result });
+      }
+    })().catch((err) => log.error("result_post_failed", { round: roundId, code: errorCode(err) })),
+  );
+  return c.json({
+    response_action: "update",
+    view: messageModal([t("close.done")], "close.modalTitle"),
   });
 }
 

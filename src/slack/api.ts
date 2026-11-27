@@ -2,8 +2,11 @@
  * Slack Web API の小さなクライアント。使うメソッドだけを持つ。
  * トークンや本文はエラーにもログにも含めない（エラーには Slack のエラーコードだけを入れる）。
  */
-import type { Directory, Messenger, RoundPost } from "../core/ports";
-import { roundMessage } from "./blocks";
+import type { Directory, Messenger, RoundPost, RoundResultPost } from "../core/ports";
+import { roundMessage, roundResultMessage } from "./blocks";
+
+/** 429 のとき、この秒数までなら待ってから1回だけ送り直す（それより長ければ失敗にする） */
+const MAX_RETRY_WAIT_SECONDS = 10;
 
 const API_BASE = "https://slack.com/api";
 
@@ -80,6 +83,31 @@ export class SlackClient implements Messenger, Directory {
     });
     if (typeof res.ts !== "string") throw new SlackApiError("chat.postMessage", "missing_ts");
     return { messageTs: res.ts };
+  }
+
+  /** 結果の概要をスレッドに投稿する。429 なら Retry-After だけ待って1回だけ送り直す */
+  async postRoundResult(post: RoundResultPost): Promise<void> {
+    const body = {
+      channel: post.channelId,
+      thread_ts: post.threadTs,
+      // スレッドの返信をチャンネルにも流すと元の投稿を書き換えたように見えるため、流さない
+      reply_broadcast: false,
+      unfurl_links: false,
+      ...roundResultMessage(post, this.appBaseUrl),
+    };
+    try {
+      await this.call("chat.postMessage", body);
+    } catch (err) {
+      if (
+        !(err instanceof SlackApiError) ||
+        err.code !== "ratelimited" ||
+        (err.retryAfter ?? 0) > MAX_RETRY_WAIT_SECONDS
+      ) {
+        throw err;
+      }
+      await new Promise((resolve) => setTimeout(resolve, (err.retryAfter ?? 1) * 1000));
+      await this.call("chat.postMessage", body);
+    }
   }
 
   async isGuest(userId: string): Promise<boolean> {
